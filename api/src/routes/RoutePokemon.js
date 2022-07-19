@@ -1,21 +1,23 @@
 const {Router} = require('express');
 const router = Router();
-const {getPokemonDbyApi, getByName} = require('../controllers/ControllerPokemon.js')
+const {getPokemonDbyApi} = require('../controllers/ControllerPokemon.js')
 const {Pokemon, Type} = require('../db')
 
 
 router.get('/', async(req,res) => {
    try{ 
         const {name} = req.query
+        const nombre = await getPokemonDbyApi()
         if(name){
-            const nombre = await getByName(name);
-            res.send(nombre).status(200)}
-        else {
-            const allInfo = await getPokemonDbyApi();           
-            res.send(allInfo).status(200)}}
+            const resultado = await nombre.filter(e => e.name.toLowerCase().includes(name.toLowerCase()));
+            resultado.length ? res.status(200).send(resultado):
+            res.status(400).json({ msg: "No se encontro el pokemon solicitado" });} 
+        else {              
+            res.send(nombre).status(200)}}
     catch(err){
-        res.send(err)}
+        res.send(err);}
 })
+
 
 router.get('/:id', async(req,res) => {
    
@@ -26,7 +28,7 @@ router.get('/:id', async(req,res) => {
         if(resultado){
             res.send(resultado).status(200)
         }else{
-            res.send("No se encuentra")
+            res.status(400).json({ msg: "No se encontro el pokemon solicitado" })
         }
     }
     catch(err){
@@ -36,18 +38,19 @@ router.get('/:id', async(req,res) => {
 })
 
 
-router.post('/', async(req, res) =>{
+ router.post('/', async(req, res) =>{
     try{
-        const {id, name, attack, hp, defense, speed, height, weight, type} = req.body
-        const crearPokemon = await Pokemon.create({id, name, attack, hp, defense, speed, height, weight})
-        const typePokemon = await Type.findAll({where: {name : type}})
+        const {id, name, attack, hp, defense, speed, types, height, weight, image} = req.body
+        const crearPokemon = await Pokemon.create({id, name, attack, hp, defense, speed, height, 
+            image: image ? image : 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/201.png', weight})
+        const typePokemon = await Type.findAll({where: {name : types}})
         crearPokemon.addType(typePokemon)
-        res.send('Pokemon creado').status(200)
+        res.send(crearPokemon).status(200)
     }
     catch(err){
         res.send(err)
     }
-})
+}) 
 
 
 
