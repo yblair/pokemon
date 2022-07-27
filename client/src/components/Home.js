@@ -7,6 +7,7 @@ import  Card  from './Card';
 import Paginado from './Paginado';
 import SearchBar from './Searchbar';
 import '../styles/Home.css'
+import b from '../assets/img/b.png'
 
 export default function Home(){
 
@@ -66,28 +67,22 @@ export default function Home(){
         e.preventDefault()
     }
 
-    //FILTRO
-/* [ ] Botones/Opciones para filtrar por tipo de pokemon
- y por pokemon existente o creado por nosotros
-[ ] Botones/Opciones para ordenar tanto ascendentemente como
- descendentemente los pokemons por orden alfabético y por ataque */
 
     return(
         <div>
         <div className="top_nav">
-            <img className='img_pokemon' />
-            <Link className="link_create" to='/pokemons'>Create</Link>
-            <h1 className="home_title">POKEMON</h1>
-            <button className="btn_reload" onClick={e => {handleClick(e)}}>Refresh</button>
-            </div>
+            <img className='img_pokemon' src={b}/>
+            </div>  
             <div className="filters">
+            <button className="btn_reload" onClick={e => {handleClick(e)}}>Refresh</button>
+            <Link className="link_create" to='/pokemons'>Create</Link>
                 <select onChange={(e) => {handleFilterByName(e)}}>
                     <option value=''>Order By Name</option>
                     <option value='asc'>A - Z</option>
                     <option value='desc'>Z - A</option>
                 </select>
                 <select onChange={(e) => {handleType(e)}}>
-                    <option>Order By Type</option>
+                    <option>Filter By Type</option>
                     <option value='all'>All</option>
                     {allTypes?.map((e) => {
                         return(
@@ -108,11 +103,6 @@ export default function Home(){
                     
                 </select>  
                 <div>
-            <Paginado
-            pokemonPerPage={pokemonPerPage}
-            allPokemons={allPokemons.length}
-            paginado={paginado}
-            />
             <SearchBar
             page = {paginado}
             />
@@ -126,7 +116,8 @@ export default function Home(){
                         <fragment >
                             <Link   className="text_frag" to={`/pokemons/${e.id}`}>
                             <Card name={e.name} 
-                                  image={e.image}/>
+                                  image={e.image}
+                                  types={e.types[0].name ?  e.types.map(e => e.name + ' ') :e.types.map(t => t + ' ')}/>
                             </Link>
                         </fragment>
                         )
@@ -134,6 +125,11 @@ export default function Home(){
                 }
                 
                 </div>
+                    <Paginado
+                    pokemonPerPage={pokemonPerPage}
+                    allPokemons={allPokemons.length}
+                    paginado={paginado}
+                    />
                 </div>
     )
 }

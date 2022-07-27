@@ -4,32 +4,39 @@ const {Pokemon, Type} = require('../db');
 //traer 40 pokemones
 const getPokemons = async() => {
     try{
-    const pokemons20 = await axios('https://pokeapi.co/api/v2/pokemon'); //me traigo la primer pagina
-    const pokemons40 = await axios('https://pokeapi.co/api/v2/pokemon/?offset=20&limit=20'); //voy a la segunda pagina
-    //const pokemons = pokemons20.data.results.concat(pokemons40.data.results); //junto la info de las dos paginas
-      const p20 = pokemons20.data.results;
-      const p40 = pokemons40.data.results;
-      const pokemons = p20.concat(p40) //devuelve un array de obj con url
-      //tengo que entrar en cada obj y devolver el name y la info 
-      for (let p of pokemons) {
-        let url = await axios(p.url);
-        //delete p.url;
-        p.name = url.data.name
-        p.id = url.data.id;
-        p.image = url.data.sprites.other.home.front_default;
-        p.hp = url.data.stats[0].base_stat;
-        p.attack = url.data.stats[1].base_stat;
-        p.defense = url.data.stats[2].base_stat;
-        p.speed = url.data.stats[5].base_stat;
-        p.height = url.data.height;
-        p.weight = url.data.weight;
-        p.types = url.data.types.map((el) => el.type.name);
-      }
+    let arrayPokemons=[]
+    const pokemons20 = await axios('https://pokeapi.co/api/v2/pokemon'); 
+    const pokemons40 = await axios('https://pokeapi.co/api/v2/pokemon/?offset=20&limit=20'); 
+    
+    const p20 = pokemons20.data.results.map(e => axios(e.url));
+    const p40 = pokemons40.data.results.map(e => axios(e.url));
+    const pokemons = p20.concat(p40) 
+     
+    const result = await Promise.all(pokemons).then(e => { 
+        e.map(p => {  arrayPokemons.push({
+        name: p.data.name,
+        id : p.data.id,
+        image : p.data.sprites.other.home.front_default,
+        hp : p.data.stats[0].base_stat,
+        attack : p.data.stats[1].base_stat,
+        defense : p.data.stats[2].base_stat,
+        speed : p.data.stats[5].base_stat,
+        height : p.data.height,
+        weight : p.data.weight,
+        types : p.data.types.map((e) => e.type.name)
+      })
+    })
 
-    console.log(pokemons)
-    return pokemons}
-    catch(err){return err}
+    return arrayPokemons
+  })
+  
+  return result
+
+  }
+
+catch(err){return err}
 }
+
 
 const getDbInfo = async() => {
   try {

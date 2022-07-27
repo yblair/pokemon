@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDetails } from '../redux/actions';
@@ -11,12 +11,22 @@ export default function Detail() {
     const dispatch = useDispatch();
     const params = useParams();
    
-    
+
+    const [detail, setDetail] = useState("")
+
+
+    function handleBoton(e){
+        e.preventDefault();
+        setDetail("")
+    }
+
     useEffect(() => {
         dispatch(getDetails(params.id))
     }, [params.id, dispatch]);  
     
     const pokemon = useSelector((state) => state.details)
+
+
 
     return (
         <div>
@@ -39,7 +49,7 @@ export default function Detail() {
                     </div>
                     <div className="btn">
                         <Link to = '/home'>
-                            <button  className='btn_home'>Close</button>    
+                            <button onChange={(e) =>{handleBoton(e)}} className='btn_home'>Close</button>    
                         </Link>
                     </div>
                 </div>

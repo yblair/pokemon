@@ -3,7 +3,8 @@ const initialState = {
     allPokemons: [],
     types: [],
     allTypes: [],
-    details: []
+    details: [],
+    allDetails: []
 
 }
 
